@@ -1,6 +1,7 @@
 # Compiler files
 cache/
 out/
+lib/chainlink-brownie-contracts/
 
 # Ignores development broadcast logs
 !/broadcast
