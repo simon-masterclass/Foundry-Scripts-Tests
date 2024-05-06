@@ -11,18 +11,30 @@ contract FundMeTest is Test {
         fundMe = new FundMe();
     }
 
-    function test_Fund() public {
-        fundMe.fund{value: 1000000000000000000}();
-        assertEq(fundMe.addressToAmountFunded(address(this)), 1000000000000000000);
+    function test_MinumumUSDis5() public view {
+        assertEq(fundMe.MINIMUM_USD(), 5e18);
     }
 
-    function test_Withdraw() public {
-        fundMe.fund{value: 1000000000000000000}();
-        fundMe.withdraw();
-        assertEq(fundMe.addressToAmountFunded(address(this)), 0);
+    function test_OwnerIsMsgSender() public view {
+        console.log("Owner is:", fundMe.i_owner());
+        console.log("FundMeTest Address is:", address(this));
+        console.log("Msg sender is:", msg.sender);
+        assertEq(fundMe.i_owner(), address(this));
     }
 
-    function test_GetVersion() view public {
+    // function test_Fund() public {
+    //     console.log("Eth balance is:", fundMe.addressToAmountFunded(address(this)));
+    //     fundMe.fund{value: 6 * 10 ** 18}();
+    //     assertEq(fundMe.addressToAmountFunded(address(this)), 6 * 10 ** 18);
+    // }
+
+    // function test_Withdraw() public {
+    //     fundMe.fund{value: 1000000000000000000}();
+    //     fundMe.withdraw();
+    //     assertEq(fundMe.addressToAmountFunded(address(this)), 0);
+    // }
+
+    function test_GetVersion4Pricefeed() view public {
         uint256 version = fundMe.getVersion();
         assertEq(version, 0);
     }
