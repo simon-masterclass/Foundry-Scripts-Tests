@@ -7,8 +7,8 @@ import {FundMe} from "../src/FundMe.sol";
 
 contract DeployFundMe is Script {
     function run() external {
-        vm.startBroadcast();
-        FundMe fundMe = new FundMe();
+       vm.startBroadcast();
+        new FundMe();
         vm.stopBroadcast();
     } 
 }
