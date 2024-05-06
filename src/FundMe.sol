@@ -11,25 +11,26 @@ contract FundMe {
 
     mapping(address => uint256) public addressToAmountFunded;
     address[] public funders;
+    AggregatorV3Interface private s_priceFeed;
 
     // Could we make this constant?  /* hint: no! We should make it immutable! */
     address public /* immutable */ i_owner;
     uint256 public constant MINIMUM_USD = 5 * 10 ** 18;
     
-    constructor() {
+    constructor(address priceFeed) {
         i_owner = msg.sender;
+        s_priceFeed = AggregatorV3Interface(priceFeed); // 0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1 = Base Sepolia ETH / USD Address
     }
 
     function fund() public payable {
-        require(msg.value.getConversionRate() >= MINIMUM_USD, "You need to spend more ETH!");
-        // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD, "You need to spend more ETH!");
+        // require(msg.value.getConversionRate() >= MINIMUM_USD, "You need to spend more ETH!");
+        require(PriceConverter.getConversionRate(msg.value, s_priceFeed) >= MINIMUM_USD, "You need to spend more ETH!");
         addressToAmountFunded[msg.sender] += msg.value;
         funders.push(msg.sender);
     }
     
     function getVersion() public view returns (uint256){
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1);
-        return priceFeed.version();
+        return s_priceFeed.version();
     }
     
     modifier onlyOwner {
