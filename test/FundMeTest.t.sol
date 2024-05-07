@@ -19,9 +19,9 @@ contract FundMeTest is Test {
     }
 
     function test_OwnerIsMsgSender() public view {
-        console.log("Owner is:", fundMe.i_owner());
-        console.log("FundMeTest Address is:", address(this));
-        console.log("Msg sender is:", msg.sender);
+        // console.log("Owner is:", fundMe.i_owner());
+        // console.log("FundMeTest(this) Address is:", address(this));
+        // console.log("Msg sender is:", msg.sender);
         assertEq(fundMe.i_owner(), msg.sender);
     }
 
