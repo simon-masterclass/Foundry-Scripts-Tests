@@ -29,17 +29,11 @@ contract FundMeTest is Test {
         assertEq(fundMe.i_owner(), msg.sender);
     }
 
-    // function test_Fund() public {
-    //     console.log("Eth balance is:", fundMe.addressToAmountFunded(address(this)));
-    //     fundMe.fund{value: 6 * 10 ** 18}();
-    //     assertEq(fundMe.addressToAmountFunded(address(this)), 6 * 10 ** 18);
-    // }
-
-    // function test_Withdraw() public {
-    //     fundMe.fund{value: 1000000000000000000}();
-    //     fundMe.withdraw();
-    //     assertEq(fundMe.addressToAmountFunded(address(this)), 0);
-    // }
+    function test_Fund() public {
+        console.log("Eth balance is:", fundMe.getAddressToAmountFunded(address(this)));
+        fundMe.fund{value: 6 * 10 ** 18}();
+        assertEq(fundMe.getAddressToAmountFunded(address(this)), 6 * 10 ** 18);
+    }
 
     function test_GetVersion4Pricefeed() view public {
         uint256 version = fundMe.getVersion();
@@ -68,4 +62,32 @@ contract FundMeTest is Test {
         uint256 amountFunded = fundMe.getAddressToAmountFunded(USER);
         assertEq(amountFunded, SEND_VALUE);
     }
+
+    function test_AddsFundersToArrayOfFunders() public {
+        vm.prank(USER); // The next TX will be from USER
+        fundMe.fund{value: SEND_VALUE}();
+
+        address funder = fundMe.getFunder(0);
+        assertEq(funder, USER);
+    }
+
+    modifier funded 
+    {
+        vm.prank(USER); // The next TX will be from USER
+        fundMe.fund{value: SEND_VALUE}();
+        _;
+    }
+
+    function test_OnlyOwnerCanWithdraw() public funded {
+        vm.prank(USER); // The next TX will be from USER
+        vm.expectRevert();
+        fundMe.withdraw();
+    }
+
+    function test_WithdrawWithASingleFunder() public funded {
+        fundMe.withdraw();
+        uint256 amountFunded = fundMe.getAddressToAmountFunded(USER);
+        assertEq(amountFunded, 0);
+    }
+
 }

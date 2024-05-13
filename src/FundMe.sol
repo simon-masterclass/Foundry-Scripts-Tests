@@ -17,6 +17,11 @@ contract FundMe {
     address public /* immutable */ i_owner;
     uint256 public constant MINIMUM_USD = 5 * 10 ** 18;
     
+    modifier onlyOwner {
+        // require(msg.sender == owner);
+        if (msg.sender != i_owner) revert FundMe__NotOwner();
+        _;
+    }
     constructor(address priceFeed) {
         i_owner = msg.sender;
         s_priceFeed = AggregatorV3Interface(priceFeed); // 0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1 = Base Sepolia ETH / USD Address
@@ -33,11 +38,6 @@ contract FundMe {
         return s_priceFeed.version();
     }
     
-    modifier onlyOwner {
-        // require(msg.sender == owner);
-        if (msg.sender != i_owner) revert FundMe__NotOwner();
-        _;
-    }
     
     function withdraw() public onlyOwner {
         for (uint256 funderIndex=0; funderIndex < s_funders.length; funderIndex++){
@@ -82,6 +82,14 @@ contract FundMe {
 
     function getAddressToAmountFunded(address funder) external view returns (uint256) {
         return s_addressToAmountFunded[funder];
+    }
+
+    function getFunder(uint256 index) external view returns (address) {
+        return s_funders[index];
+    }
+
+    function getFunders() external view returns (address[] memory) {
+        return s_funders;
     }
 }
 
