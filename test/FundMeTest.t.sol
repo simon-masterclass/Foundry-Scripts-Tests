@@ -10,6 +10,7 @@ contract FundMeTest is Test {
     address USER = makeAddr("user");
     uint256 constant SEND_VALUE = 0.1 ether;
     uint256 constant STARTING_BALANCE = 100 ether;
+    uint256 constant GAS_PRICE = 1; // 1 gwei is the best reference point for gas price
 
     function setUp() public {
         // fundMe = DeployFundMe.run();
@@ -87,19 +88,25 @@ contract FundMeTest is Test {
     function test_WithdrawWithASingleFunder() public funded {
         // Arrange
         uint256 startingOwnerBalance = fundMe.getOwner().balance;
-        console.log("Starting Owner Balance:", startingOwnerBalance); 
+        //console.log("Starting Owner Balance:", startingOwnerBalance); 
         uint256 startingFundMeBalance = address(fundMe).balance;
-        console.log("Starting FundMe Balance:", startingFundMeBalance);
+        //console.log("Starting FundMe Balance:", startingFundMeBalance);
 
         // Act
+        vm.txGasPrice(GAS_PRICE);
         vm.prank(fundMe.getOwner());
+        uint256 gasStart = gasleft();
         fundMe.withdraw();
+        uint256 gasEnd = gasleft();
+        uint256 gasUsed = (gasStart - gasEnd) * tx.gasprice;
+        // uint256 gasUsed = (gasStart - gasleft())*tx.gasprice; NOTE: This is slightly more expensive than the 2 lines above
+        console.log("Gas Used:", gasUsed);  
 
         // Assert
         uint256 endingOwnerBalance = fundMe.getOwner().balance;  
-        console.log("Ending Owner Balance:", endingOwnerBalance);     
+        // console.log("Ending Owner Balance:", endingOwnerBalance);     
         uint256 endingFundMeBalance = address(fundMe).balance;
-        console.log("Ending FundMe Balance:", endingFundMeBalance);
+        // console.log("Ending FundMe Balance:", endingFundMeBalance);
 
         assertEq(endingFundMeBalance, 0);
         assertEq(endingOwnerBalance, startingOwnerBalance + startingFundMeBalance);
@@ -127,6 +134,40 @@ contract FundMeTest is Test {
         // Act
         vm.startPrank(fundMe.getOwner());
         fundMe.withdraw();
+        vm.stopPrank();
+
+        // Assert
+        uint256 endingOwnerBalance = fundMe.getOwner().balance;  
+        console.log("Ending Owner Balance:", endingOwnerBalance);     
+        uint256 endingFundMeBalance = address(fundMe).balance;
+        console.log("Ending FundMe Balance:", endingFundMeBalance);
+
+        assert(endingFundMeBalance == 0);
+        assert(endingOwnerBalance == startingOwnerBalance + startingFundMeBalance);
+    }
+
+    function testWithdrawFromMultipleFunders_Cheaper() public funded {
+        // Arrange
+        uint160 numberOfFunders = 10;
+        uint160 startingFunderIndex = 1;
+
+        for (uint160 i = startingFunderIndex; i <= numberOfFunders; i++) {
+            // vm.prank = new address is the next sender
+            // vm.deal new address gets dealt 0.1 ether
+            // hoax = vm.prank + vm.deal
+            hoax(address(i), SEND_VALUE); // The next TX will be from USER
+            fundMe.fund{value: SEND_VALUE}();
+        }
+
+
+        uint256 startingOwnerBalance = fundMe.getOwner().balance;
+        console.log("Starting Owner Balance:", startingOwnerBalance); 
+        uint256 startingFundMeBalance = address(fundMe).balance;
+        console.log("Starting FundMe Balance:", startingFundMeBalance);
+
+        // Act
+        vm.startPrank(fundMe.getOwner());
+        fundMe.cheaperWithdraw();
         vm.stopPrank();
 
         // Assert

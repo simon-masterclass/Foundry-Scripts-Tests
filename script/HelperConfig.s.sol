@@ -16,6 +16,8 @@ contract HelperConfig is Script {
         address priceFeed;
     }
 
+    uint256 private s_test = 7;
+
     uint8 public constant DECIMALS = 8;
     int256 public constant INITIAL_PRICE_USD = 2500e8;
 

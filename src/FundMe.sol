@@ -11,6 +11,7 @@ contract FundMe {
 
     mapping(address => uint256) private s_addressToAmountFunded;
     address[] private s_funders;
+    uint256 private s_test = 7;
     AggregatorV3Interface private s_priceFeed;
 
     // Could we make this constant?  /* hint: no! We should make it immutable! */
@@ -36,6 +37,23 @@ contract FundMe {
     
     function getVersion() public view returns (uint256){
         return s_priceFeed.version();
+    }
+
+    function cheaperWithdraw() public onlyOwner {
+        // cheaper way to withdraw
+        uint256 fundersLength = s_funders.length;
+
+        for (uint256 funderIndex=0; funderIndex < fundersLength; funderIndex++){
+            address funder = s_funders[funderIndex];
+            s_addressToAmountFunded[funder] = 0;
+        }
+        //reset the funders array
+        s_funders = new address[](0);
+
+        // call
+        (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
+        require(callSuccess, "Call failed");
+        // payable(i_owner).transfer(address(this).balance); 
     }
     
     
