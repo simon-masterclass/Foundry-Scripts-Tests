@@ -11,9 +11,9 @@ contract FundFundMe is Script {
     
     function fundFundMe(address mostRecentlyDeployed) public {
         vm.startBroadcast();
-            FundMe(payable(mostRecentlyDeployed)).fund{value: SEND_VALUE}();
+        FundMe(payable(mostRecentlyDeployed)).fund{value: SEND_VALUE}();
         vm.stopBroadcast();
-            console.log("Funded FundMe contract with: ", SEND_VALUE, "ETH");
+        console.log("Funded FundMe contract with: ", SEND_VALUE, "ETH");
     }
 
     function run() external {
@@ -22,7 +22,9 @@ contract FundFundMe is Script {
             "FundMe",
             block.chainid 
         );
+        vm.startBroadcast();
         fundFundMe(mostRecentlyDeployed);
+        vm.stopBroadcast();
     }
 
 }
@@ -32,9 +34,9 @@ contract WithdrawFundMe is Script {
     
     function withdrawFundMe(address mostRecentlyDeployed) public {
         vm.startBroadcast();
-            FundMe(payable(mostRecentlyDeployed)).withdraw();
+        FundMe(payable(mostRecentlyDeployed)).withdraw();
         vm.stopBroadcast();
-            console.log("Withdrawal Successful!!!");
+        console.log("Withdrawal Successful!!!");
     }
 
     function run() external {
@@ -43,6 +45,8 @@ contract WithdrawFundMe is Script {
             "FundMe",
             block.chainid 
         );
+        vm.startBroadcast();
         withdrawFundMe(mostRecentlyDeployed);
+        vm.stopBroadcast();
     }    
 }
