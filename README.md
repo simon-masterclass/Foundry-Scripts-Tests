@@ -1,6 +1,7 @@
-## Foundry
+## Foundry Test Scripts
+This repository contains an awesome project test scripts setup for the Foundry Ethereum development toolkit. Test scripts are integrated with a Fund Me contract the implements the aggregatorv2 interface - Chainlink oracles are very handy and this contract is a good example of how to use them.
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+**Great Setup for deploying to multiple chains**
 
 Foundry consists of:
 
