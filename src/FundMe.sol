@@ -16,7 +16,7 @@ contract FundMe {
 
     // Could we make this constant?  /* hint: no! We should make it immutable! */
     address private immutable i_owner;
-    uint256 public constant MINIMUM_USD = 5 * 10 ** 18;
+    uint256 private constant MINIMUM_USD = 5 * 10 ** 18;
     
     modifier onlyOwner {
         // require(msg.sender == owner);
@@ -112,6 +112,10 @@ contract FundMe {
 
     function getOwner() external view returns (address) {
         return i_owner;
+    }
+
+    function getMinumumUSD() external pure returns (uint256) {
+        return MINIMUM_USD;
     }
 }
 
